@@ -1,0 +1,90 @@
+#!/bin/bash
+
+# MyFVM - Flutter Version Manager
+# Switch to an existing Flutter version
+
+set -e
+
+VERSION=$1
+if [ -z "$VERSION" ]; then
+    echo "Usage: flutter-switch <version>"
+    echo "Example: flutter-switch 3.24.5"
+    echo ""
+    echo "Installed versions:"
+    if [ -d "$HOME/flutter" ]; then
+        versions_found=false
+        for dir in "$HOME/flutter"/flutter-*; do
+            if [ -d "$dir" ]; then
+                versions_found=true
+                version=$(basename "$dir" | sed 's/flutter-//')
+                current=""
+                if [ -L "$HOME/.fvm/current" ] && [ "$(readlink "$HOME/.fvm/current")" = "$dir" ]; then
+                    current=" ✅ (current)"
+                fi
+                echo "  - $version$current"
+            fi
+        done
+        
+        if [ "$versions_found" = false ]; then
+            echo "  No versions installed yet."
+            echo "  Run 'flutter-install <version>' to install a version."
+        fi
+    else
+        echo "  No versions installed yet."
+        echo "  Run 'flutter-install <version>' to install a version."
+    fi
+    echo ""
+    echo "To see available versions:"
+    echo "  flutter-versions"
+    exit 1
+fi
+
+# Validate version format
+if [[ ! $VERSION =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[0-9]+\.[0-9]+\.pre)?(-[0-9]+\.[0-9]+\.dev)?$ ]]; then
+    echo "❌ Invalid version format: $VERSION"
+    echo ""
+    echo "Version should be in format: X.Y.Z"
+    echo "Examples: 3.24.5, 3.35.3, 3.22.4"
+    echo ""
+    echo "To validate a version:"
+    echo "  flutter-versions $VERSION"
+    exit 1
+fi
+
+FLUTTER_DIR="$HOME/flutter"
+VERSION_DIR="$FLUTTER_DIR/flutter-$VERSION"
+FVM_DIR="$HOME/.fvm"
+
+# Check if version exists
+if [ ! -d "$VERSION_DIR" ]; then
+    echo "❌ Flutter $VERSION is not installed."
+    echo "📍 Available versions:"
+    if [ -d "$FLUTTER_DIR" ]; then
+        for dir in "$FLUTTER_DIR"/flutter-*; do
+            if [ -d "$dir" ]; then
+                version=$(basename "$dir" | sed 's/flutter-//')
+                echo "  - $version"
+            fi
+        done
+    else
+        echo "  No versions installed yet."
+    fi
+    echo ""
+    echo "To install Flutter $VERSION:"
+    echo "  flutter-install $VERSION"
+    exit 1
+fi
+
+# Create .fvm directory if it doesn't exist
+mkdir -p "$FVM_DIR"
+
+# Switch to the version
+echo "🔄 Switching to Flutter $VERSION..."
+ln -sf "$VERSION_DIR" "$FVM_DIR/current"
+
+echo "✅ Switched to Flutter $VERSION"
+echo "📍 Location: $VERSION_DIR"
+echo "🔗 Symlink: $FVM_DIR/current -> $VERSION_DIR"
+echo ""
+echo "Current Flutter version:"
+flutter --version

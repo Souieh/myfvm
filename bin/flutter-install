@@ -1,0 +1,182 @@
+#!/bin/bash
+
+# MyFVM - Flutter Version Manager
+# Install a new Flutter version
+
+set -e
+
+VERSION=$1
+if [ -z "$VERSION" ]; then
+    echo "Usage: flutter-install <version>"
+    echo "Example: flutter-install 3.24.5"
+    echo ""
+    echo "🔍 Fetching available versions..."
+    
+    # Function to fetch versions from GitHub API
+    fetch_versions() {
+        local cache_file="$HOME/.cache/myfvm/versions.json"
+        local cache_age=3600  # 1 hour cache
+        local releases=""
+        
+        # Check if cache exists and is recent
+        if [ -f "$cache_file" ] && [ $(($(date +%s) - $(stat -c %Y "$cache_file" 2>/dev/null || echo 0))) -lt $cache_age ]; then
+            releases=$(cat "$cache_file" 2>/dev/null)
+        else
+            # Create cache directory if it doesn't exist
+            mkdir -p "$(dirname "$cache_file")"
+            
+            # Fetch from API
+            local api_url="https://api.github.com/repos/flutter/flutter/releases"
+            releases=$(curl -s "$api_url" 2>/dev/null)
+            
+            # Cache the result
+            if [ -n "$releases" ]; then
+                echo "$releases" > "$cache_file"
+            fi
+        fi
+        
+        if [ -n "$releases" ]; then
+            # Extract stable versions (no pre/dev suffixes)
+            local stable_versions=$(echo "$releases" | grep -o '"tag_name": "[^"]*' | cut -d'"' -f4 | sed 's/v//' | grep '^[0-9]\+\.[0-9]\+\.[0-9]\+$' | head -5)
+            # Extract beta versions
+            local beta_versions=$(echo "$releases" | grep -o '"tag_name": "[^"]*' | cut -d'"' -f4 | sed 's/v//' | grep '^[0-9]\+\.[0-9]\+\.[0-9]\+-[0-9]\+\.[0-9]\+\.pre$' | head -3)
+            
+            if [ -n "$stable_versions" ]; then
+                echo "Available stable versions:"
+                echo "$stable_versions" | while read -r version; do
+                    echo "  - $version (stable)"
+                done
+                echo ""
+            fi
+            
+            if [ -n "$beta_versions" ]; then
+                echo "Available beta versions:"
+                echo "$beta_versions" | while read -r version; do
+                    echo "  - $version (beta)"
+                done
+                echo ""
+            fi
+            
+            # Show latest stable
+            local latest_stable=$(echo "$stable_versions" | head -1)
+            if [ -n "$latest_stable" ]; then
+                echo "🌟 Latest stable: $latest_stable"
+            fi
+            
+            # If no stable versions found, show fallback
+            if [ -z "$stable_versions" ]; then
+                echo "⚠️  No recent stable versions found in API"
+                echo ""
+                echo "Fallback - Known stable versions:"
+                echo "  - 3.35.3 (latest stable)"
+                echo "  - 3.24.5 (stable, recommended)"
+                echo "  - 3.22.4"
+                echo "  - 3.19.6"
+                echo ""
+            fi
+        else
+            echo "⚠️  Could not fetch versions from GitHub API"
+            echo ""
+            echo "Fallback - Known stable versions:"
+            echo "  - 3.35.3 (latest stable)"
+            echo "  - 3.24.5 (stable, recommended)"
+            echo "  - 3.22.4"
+            echo "  - 3.19.6"
+        fi
+    }
+    
+    fetch_versions
+    echo ""
+    echo "To see all available versions:"
+    echo "  flutter-versions"
+    exit 1
+fi
+
+# Validate version format
+if [[ ! $VERSION =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[0-9]+\.[0-9]+\.pre)?(-[0-9]+\.[0-9]+\.dev)?$ ]]; then
+    echo "❌ Invalid version format: $VERSION"
+    echo ""
+    echo "Version should be in format: X.Y.Z"
+    echo "Examples: 3.24.5, 3.35.3, 3.22.4"
+    echo ""
+    echo "For beta/dev versions: X.Y.Z-0.1.pre or X.Y.Z-0.0.dev"
+    echo ""
+    echo "To validate a version:"
+    echo "  flutter-versions $VERSION"
+    exit 1
+fi
+
+FLUTTER_DIR="$HOME/flutter"
+VERSION_DIR="$FLUTTER_DIR/flutter-$VERSION"
+FVM_DIR="$HOME/.fvm"
+
+echo "🚀 Installing Flutter $VERSION..."
+
+# Create directories
+mkdir -p "$FLUTTER_DIR"
+mkdir -p "$FVM_DIR"
+
+# Check if version already exists
+if [ -d "$VERSION_DIR" ]; then
+    echo "⚠️  Flutter $VERSION is already installed at $VERSION_DIR"
+    read -p "Do you want to reinstall? (y/N): " -n 1 -r
+    echo
+    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+        echo "Installation cancelled."
+        exit 0
+    fi
+    echo "🗑️  Removing existing installation..."
+    rm -rf "$VERSION_DIR"
+fi
+
+# Download Flutter
+echo "📥 Downloading Flutter $VERSION..."
+cd "$FLUTTER_DIR"
+
+# Check if git is available
+if ! command -v git >/dev/null 2>&1; then
+    echo "❌ Git is not installed. Please install git first."
+    echo "   Ubuntu/Debian: sudo apt install git"
+    echo "   macOS: brew install git"
+    exit 1
+fi
+
+# Clone with error handling
+if ! git clone https://github.com/flutter/flutter.git -b "$VERSION" "flutter-$VERSION"; then
+    echo "❌ Failed to download Flutter $VERSION"
+    echo ""
+    echo "Possible reasons:"
+    echo "  - Version $VERSION doesn't exist"
+    echo "  - Network connection issues"
+    echo "  - Git repository is unavailable"
+    echo ""
+    echo "To check available versions:"
+    echo "  flutter-versions"
+    exit 1
+fi
+
+# Set up the installation
+echo "🔧 Setting up Flutter $VERSION..."
+cd "$VERSION_DIR"
+git checkout "$VERSION"
+
+# Create symlink to current
+echo "🔗 Creating symlink..."
+ln -sf "$VERSION_DIR" "$FVM_DIR/current"
+
+# Add to PATH if not already there
+if ! grep -q "~/.fvm/current/bin" ~/.bashrc 2>/dev/null; then
+    echo "📝 Adding to PATH..."
+    echo 'export PATH="$HOME/.fvm/current/bin:$PATH"' >> ~/.bashrc
+    echo "⚠️  Please run 'source ~/.bashrc' or restart your terminal"
+fi
+
+echo "✅ Flutter $VERSION installed successfully!"
+echo "📍 Location: $VERSION_DIR"
+echo "🔗 Symlink: $FVM_DIR/current -> $VERSION_DIR"
+echo ""
+echo "To use this version:"
+echo "  flutter-switch $VERSION"
+echo ""
+echo "To check current version:"
+echo "  flutter --version"

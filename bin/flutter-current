@@ -1,0 +1,39 @@
+#!/bin/bash
+
+# MyFVM - Flutter Version Manager
+# Show current Flutter version information
+
+FVM_DIR="$HOME/.fvm"
+
+echo "🔍 Current Flutter Version Info:"
+echo "================================"
+
+if [ ! -L "$FVM_DIR/current" ]; then
+    echo "❌ No Flutter version is currently active."
+    echo ""
+    echo "To install and activate a version:"
+    echo "  flutter-install 3.24.5"
+    exit 1
+fi
+
+current_path=$(readlink "$FVM_DIR/current")
+current_version=$(basename "$current_path" | sed 's/flutter-//')
+
+echo "📌 Active Version: $current_version"
+echo "📍 Location: $current_path"
+echo "🔗 Symlink: $FVM_DIR/current -> $current_path"
+echo ""
+
+# Check if Flutter is in PATH
+if command -v flutter >/dev/null 2>&1; then
+    echo "✅ Flutter is available in PATH"
+    echo ""
+    echo "Flutter version details:"
+    flutter --version
+else
+    echo "❌ Flutter is not in PATH"
+    echo ""
+    echo "To add Flutter to PATH:"
+    echo "  echo 'export PATH=\"\$HOME/.fvm/current/bin:\$PATH\"' >> ~/.bashrc"
+    echo "  source ~/.bashrc"
+fi

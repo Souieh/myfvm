@@ -1,0 +1,138 @@
+#!/bin/bash
+
+# MyFVM - Flutter Version Manager
+# Clean up incomplete installations and temporary files
+
+FLUTTER_DIR="$HOME/flutter"
+FVM_DIR="$HOME/.fvm"
+
+echo "🧹 MyFVM Cleanup Tool"
+echo "===================="
+echo ""
+
+# Check for incomplete installations
+echo "🔍 Checking for incomplete installations..."
+incomplete_found=false
+
+if [ -d "$FLUTTER_DIR" ]; then
+    for dir in "$FLUTTER_DIR"/flutter-*; do
+        if [ -d "$dir" ]; then
+            version=$(basename "$dir" | sed 's/flutter-//')
+            if [ ! -f "$dir/bin/flutter" ]; then
+                echo "  ❌ Incomplete: $version (missing bin/flutter)"
+                incomplete_found=true
+            fi
+        fi
+    done
+fi
+
+if [ "$incomplete_found" = false ]; then
+    echo "  ✅ No incomplete installations found"
+fi
+
+# Check for broken symlinks
+echo ""
+echo "🔍 Checking for broken symlinks..."
+broken_found=false
+
+if [ -L "$FVM_DIR/current" ]; then
+    if [ ! -e "$FVM_DIR/current" ]; then
+        echo "  ❌ Broken symlink: $FVM_DIR/current"
+        broken_found=true
+    fi
+fi
+
+if [ "$broken_found" = false ]; then
+    echo "  ✅ No broken symlinks found"
+fi
+
+# Check for orphaned directories
+echo ""
+echo "🔍 Checking for orphaned directories..."
+orphaned_found=false
+
+if [ -d "$FLUTTER_DIR" ]; then
+    for dir in "$FLUTTER_DIR"/flutter-*; do
+        if [ -d "$dir" ]; then
+            version=$(basename "$dir" | sed 's/flutter-//')
+            # Check if directory is empty or contains only git files
+            if [ -z "$(find "$dir" -type f -not -path '*/\.git/*' | head -1)" ]; then
+                echo "  ❌ Orphaned: $version (empty or git-only)"
+                orphaned_found=true
+            fi
+        fi
+    done
+fi
+
+if [ "$orphaned_found" = false ]; then
+    echo "  ✅ No orphaned directories found"
+fi
+
+# Summary
+echo ""
+echo "📊 Summary:"
+if [ "$incomplete_found" = true ] || [ "$broken_found" = true ] || [ "$orphaned_found" = true ]; then
+    echo "  ⚠️  Issues found that can be cleaned up"
+    echo ""
+    read -p "Do you want to clean up these issues? (y/N): " -n 1 -r
+    echo
+    if [[ $REPLY =~ ^[Yy]$ ]]; then
+        echo ""
+        echo "🧹 Starting cleanup..."
+        
+        # Remove incomplete installations
+        if [ "$incomplete_found" = true ]; then
+            echo "  Removing incomplete installations..."
+            if [ -d "$FLUTTER_DIR" ]; then
+                for dir in "$FLUTTER_DIR"/flutter-*; do
+                    if [ -d "$dir" ]; then
+                        version=$(basename "$dir" | sed 's/flutter-//')
+                        if [ ! -f "$dir/bin/flutter" ]; then
+                            echo "    🗑️  Removing $version"
+                            rm -rf "$dir"
+                        fi
+                    fi
+                done
+            fi
+        fi
+        
+        # Remove broken symlinks
+        if [ "$broken_found" = true ]; then
+            echo "  Removing broken symlinks..."
+            if [ -L "$FVM_DIR/current" ] && [ ! -e "$FVM_DIR/current" ]; then
+                echo "    🗑️  Removing broken current symlink"
+                rm -f "$FVM_DIR/current"
+            fi
+        fi
+        
+        # Remove orphaned directories
+        if [ "$orphaned_found" = true ]; then
+            echo "  Removing orphaned directories..."
+            if [ -d "$FLUTTER_DIR" ]; then
+                for dir in "$FLUTTER_DIR"/flutter-*; do
+                    if [ -d "$dir" ]; then
+                        version=$(basename "$dir" | sed 's/flutter-//')
+                        if [ -z "$(find "$dir" -type f -not -path '*/\.git/*' | head -1)" ]; then
+                            echo "    🗑️  Removing $version"
+                            rm -rf "$dir"
+                        fi
+                    fi
+                done
+            fi
+        fi
+        
+        echo "  ✅ Cleanup completed!"
+    else
+        echo "  Cleanup cancelled."
+    fi
+else
+    echo "  ✅ No cleanup needed - everything looks good!"
+fi
+
+echo ""
+echo "Current status:"
+if [ -f "$(dirname "$0")/flutter-list" ]; then
+    "$(dirname "$0")/flutter-list"
+else
+    echo "  Run 'flutter-list' to see installed versions"
+fi

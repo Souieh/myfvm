@@ -1,0 +1,101 @@
+#!/bin/bash
+
+# MyFVM - Flutter Version Manager
+# Uninstall a Flutter version
+
+set -e
+
+VERSION=$1
+if [ -z "$VERSION" ]; then
+    echo "Usage: flutter-uninstall <version>"
+    echo "Example: flutter-uninstall 3.24.5"
+    echo ""
+    echo "Installed versions:"
+    if [ -d "$HOME/flutter" ]; then
+        for dir in "$HOME/flutter"/flutter-*; do
+            if [ -d "$dir" ]; then
+                version=$(basename "$dir" | sed 's/flutter-//')
+                current=""
+                if [ -L "$HOME/.fvm/current" ] && [ "$(readlink "$HOME/.fvm/current")" = "$dir" ]; then
+                    current=" (current)"
+                fi
+                echo "  - $version$current"
+            fi
+        done
+    else
+        echo "  No versions installed yet."
+    fi
+    exit 1
+fi
+
+FLUTTER_DIR="$HOME/flutter"
+VERSION_DIR="$FLUTTER_DIR/flutter-$VERSION"
+FVM_DIR="$HOME/.fvm"
+
+# Check if version exists
+if [ ! -d "$VERSION_DIR" ]; then
+    echo "❌ Flutter $VERSION is not installed."
+    echo "📍 Available versions:"
+    if [ -d "$FLUTTER_DIR" ]; then
+        for dir in "$FLUTTER_DIR"/flutter-*; do
+            if [ -d "$dir" ]; then
+                version=$(basename "$dir" | sed 's/flutter-//')
+                echo "  - $version"
+            fi
+        done
+    else
+        echo "  No versions installed yet."
+    fi
+    exit 1
+fi
+
+# Check if this is the current version
+if [ -L "$FVM_DIR/current" ] && [ "$(readlink "$FVM_DIR/current")" = "$VERSION_DIR" ]; then
+    echo "⚠️  Flutter $VERSION is currently active."
+    echo "   You cannot uninstall the active version."
+    echo ""
+    echo "To uninstall this version:"
+    echo "  1. Switch to another version: flutter-switch <other-version>"
+    echo "  2. Then run: flutter-uninstall $VERSION"
+    exit 1
+fi
+
+# Confirm uninstallation
+echo "🗑️  About to uninstall Flutter $VERSION"
+echo "📍 Location: $VERSION_DIR"
+echo ""
+read -p "Are you sure you want to continue? (y/N): " -n 1 -r
+echo
+if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+    echo "Uninstallation cancelled."
+    exit 0
+fi
+
+# Remove the version directory
+echo "🗑️  Removing Flutter $VERSION..."
+rm -rf "$VERSION_DIR"
+
+echo "✅ Flutter $VERSION uninstalled successfully!"
+echo ""
+echo "Remaining versions:"
+if [ -d "$FLUTTER_DIR" ]; then
+    versions_found=false
+    for dir in "$FLUTTER_DIR"/flutter-*; do
+        if [ -d "$dir" ]; then
+            versions_found=true
+            version=$(basename "$dir" | sed 's/flutter-//')
+            current=""
+            if [ -L "$FVM_DIR/current" ] && [ "$(readlink "$FVM_DIR/current")" = "$dir" ]; then
+                current=" ✅ (current)"
+            fi
+            echo "  - $version$current"
+        fi
+    done
+    
+    if [ "$versions_found" = false ]; then
+        echo "  No versions remaining."
+        echo "  Run 'flutter-install <version>' to install a version."
+    fi
+else
+    echo "  No versions remaining."
+fi

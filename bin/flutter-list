@@ -1,0 +1,68 @@
+#!/bin/bash
+
+# MyFVM - Flutter Version Manager
+# List all installed Flutter versions
+
+FLUTTER_DIR="$HOME/flutter"
+FVM_DIR="$HOME/.fvm"
+
+echo "📋 Installed Flutter Versions:"
+echo "================================"
+
+if [ ! -d "$FLUTTER_DIR" ]; then
+    echo "❌ No Flutter versions installed yet."
+    echo ""
+    echo "To install a version:"
+    echo "  flutter-install 3.24.5"
+    exit 0
+fi
+
+# Find current version
+current_version=""
+if [ -L "$FVM_DIR/current" ]; then
+    current_path=$(readlink "$FVM_DIR/current")
+    current_version=$(basename "$current_path" | sed 's/flutter-//')
+fi
+
+# List all versions
+versions_found=false
+for dir in "$FLUTTER_DIR"/flutter-*; do
+    if [ -d "$dir" ]; then
+        versions_found=true
+        version=$(basename "$dir" | sed 's/flutter-//')
+        status=""
+        
+        if [ "$version" = "$current_version" ]; then
+            status=" ✅ (current)"
+        fi
+        
+        # Get version info
+        if [ -f "$dir/bin/flutter" ]; then
+            echo "  $version$status"
+            echo "    📍 $dir"
+        else
+            echo "  $version$status (incomplete)"
+            echo "    📍 $dir"
+        fi
+    fi
+done
+
+if [ "$versions_found" = false ]; then
+    echo "❌ No Flutter versions found in $FLUTTER_DIR"
+    echo ""
+    echo "To install a version:"
+    echo "  flutter-install 3.24.5"
+else
+    echo ""
+    echo "Current symlink:"
+    if [ -L "$FVM_DIR/current" ]; then
+        echo "  🔗 $FVM_DIR/current -> $(readlink "$FVM_DIR/current")"
+    else
+        echo "  ❌ No current symlink found"
+    fi
+    echo ""
+    echo "Commands:"
+    echo "  flutter-switch <version>  - Switch to a version"
+    echo "  flutter-install <version> - Install a new version"
+    echo "  flutter-current          - Show current version info"
+fi

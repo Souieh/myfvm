@@ -1,0 +1,29 @@
+# MyFVM Configuration File
+# This file contains default settings for MyFVM
+
+# Default Flutter installation directory
+FLUTTER_DIR="$HOME/flutter"
+
+# FVM symlink directory
+FVM_DIR="$HOME/.fvm"
+
+# Default Flutter version (used when no version is specified)
+DEFAULT_VERSION="3.24.5"
+
+# Auto-add to PATH (true/false)
+AUTO_ADD_TO_PATH=true
+
+# Preferred Flutter channel (stable/beta/dev)
+PREFERRED_CHANNEL="stable"
+
+# Cache directory for downloads
+CACHE_DIR="$HOME/.cache/myfvm"
+
+# Log level (quiet/normal/verbose)
+LOG_LEVEL="normal"
+
+# Auto-cleanup incomplete installations (true/false)
+AUTO_CLEANUP=true
+
+# Check for updates on startup (true/false)
+CHECK_UPDATES=false

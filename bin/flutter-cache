@@ -1,0 +1,82 @@
+#!/bin/bash
+
+# MyFVM - Flutter Version Manager
+# Cache management utility
+
+COMMAND=$1
+
+CACHE_DIR="$HOME/.cache/myfvm"
+CACHE_FILE="$CACHE_DIR/versions.json"
+
+echo "🗄️  MyFVM Cache Manager"
+echo "======================="
+echo ""
+
+case $COMMAND in
+    clear|clean)
+        echo "🧹 Clearing MyFVM cache..."
+        if [ -f "$CACHE_FILE" ]; then
+            rm -f "$CACHE_FILE"
+            echo "✅ Cache cleared successfully"
+        else
+            echo "ℹ️  No cache file found"
+        fi
+        
+        if [ -d "$CACHE_DIR" ]; then
+            rmdir "$CACHE_DIR" 2>/dev/null || true
+        fi
+        ;;
+    status|info)
+        echo "📊 Cache Status:"
+        echo ""
+        if [ -f "$CACHE_FILE" ]; then
+            cache_size=$(du -h "$CACHE_FILE" | cut -f1)
+            cache_age=$(($(date +%s) - $(stat -c %Y "$CACHE_FILE" 2>/dev/null || echo 0)))
+            cache_age_hours=$((cache_age / 3600))
+            cache_age_minutes=$(((cache_age % 3600) / 60))
+            
+            echo "  📁 Cache file: $CACHE_FILE"
+            echo "  📏 Size: $cache_size"
+            echo "  ⏰ Age: ${cache_age_hours}h ${cache_age_minutes}m"
+            echo ""
+            
+            if [ $cache_age -lt 3600 ]; then
+                echo "  ✅ Cache is fresh (< 1 hour old)"
+            else
+                echo "  ⚠️  Cache is stale (> 1 hour old)"
+                echo "     Run 'flutter-cache clear' to refresh"
+            fi
+        else
+            echo "  ❌ No cache file found"
+            echo "  📁 Cache directory: $CACHE_DIR"
+        fi
+        ;;
+    refresh|update)
+        echo "🔄 Refreshing cache..."
+        if [ -f "$CACHE_FILE" ]; then
+            rm -f "$CACHE_FILE"
+        fi
+        
+        # Trigger a fresh fetch by running flutter-versions
+        echo "  Fetching latest versions..."
+        if [ -f "$(dirname "$0")/flutter-versions" ]; then
+            "$(dirname "$0")/flutter-versions" >/dev/null 2>&1
+            echo "  ✅ Cache refreshed successfully"
+        else
+            echo "  ❌ Could not refresh cache"
+        fi
+        ;;
+    *)
+        echo "Usage: flutter-cache <command>"
+        echo ""
+        echo "Commands:"
+        echo "  clear    - Clear the version cache"
+        echo "  status   - Show cache status and age"
+        echo "  refresh  - Refresh the cache with latest data"
+        echo ""
+        echo "Examples:"
+        echo "  flutter-cache clear    # Clear cache"
+        echo "  flutter-cache status   # Check cache status"
+        echo "  flutter-cache refresh  # Update cache"
+        ;;
+esac

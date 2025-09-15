@@ -1,0 +1,172 @@
+#!/bin/bash
+
+# MyFVM - Flutter Version Manager
+# Show available Flutter versions and validate version strings
+
+VERSION=$1
+
+echo "📋 Flutter Version Information"
+echo "==============================="
+echo ""
+
+# Function to validate version format
+validate_version() {
+    local version=$1
+    # Check if version matches pattern like 3.24.5 or 3.35.3
+    if [[ $version =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+        return 0
+    else
+        return 1
+    fi
+}
+
+# Function to get latest stable version
+get_latest_stable() {
+    # Try to get latest version from Flutter's releases API
+    local latest=$(curl -s https://api.github.com/repos/flutter/flutter/releases/latest 2>/dev/null | grep -o '"tag_name": "[^"]*' | cut -d'"' -f4 | sed 's/v//')
+    if [ -n "$latest" ] && [[ $latest =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+        echo "$latest"
+    else
+        echo "3.35.3"  # Fallback to known stable version
+    fi
+}
+
+# If no version specified, show available versions
+if [ -z "$VERSION" ]; then
+    echo "📌 Available Flutter Versions:"
+    echo ""
+    echo "🔍 Fetching latest releases from GitHub..."
+    
+    # Function to fetch and categorize versions
+    fetch_and_categorize_versions() {
+        local cache_file="$HOME/.cache/myfvm/versions.json"
+        local cache_age=3600  # 1 hour cache
+        local releases=""
+        
+        # Check if cache exists and is recent
+        if [ -f "$cache_file" ] && [ $(($(date +%s) - $(stat -c %Y "$cache_file" 2>/dev/null || echo 0))) -lt $cache_age ]; then
+            releases=$(cat "$cache_file" 2>/dev/null)
+        else
+            # Create cache directory if it doesn't exist
+            mkdir -p "$(dirname "$cache_file")"
+            
+            # Fetch from API
+            local api_url="https://api.github.com/repos/flutter/flutter/releases"
+            releases=$(curl -s "$api_url" 2>/dev/null)
+            
+            # Cache the result
+            if [ -n "$releases" ]; then
+                echo "$releases" > "$cache_file"
+            fi
+        fi
+        
+        if [ -n "$releases" ]; then
+            # Extract stable versions
+            local stable_versions=$(echo "$releases" | grep -o '"tag_name": "[^"]*' | cut -d'"' -f4 | sed 's/v//' | grep '^[0-9]\+\.[0-9]\+\.[0-9]\+$' | head -5)
+            # Extract beta versions
+            local beta_versions=$(echo "$releases" | grep -o '"tag_name": "[^"]*' | cut -d'"' -f4 | sed 's/v//' | grep '^[0-9]\+\.[0-9]\+\.[0-9]\+-[0-9]\+\.[0-9]\+\.pre$' | head -3)
+            # Extract dev versions
+            local dev_versions=$(echo "$releases" | grep -o '"tag_name": "[^"]*' | cut -d'"' -f4 | sed 's/v//' | grep '^[0-9]\+\.[0-9]\+\.[0-9]\+-[0-9]\+\.[0-9]\+\.dev$' | head -3)
+            
+            if [ -n "$stable_versions" ]; then
+                echo "  Stable Versions (Recommended):"
+                echo "$stable_versions" | while read -r version; do
+                    echo "    - $version"
+                done
+                echo ""
+            fi
+            
+            if [ -n "$beta_versions" ]; then
+                echo "  Beta Versions:"
+                echo "$beta_versions" | while read -r version; do
+                    echo "    - $version"
+                done
+                echo ""
+            fi
+            
+            if [ -n "$dev_versions" ]; then
+                echo "  Dev Versions:"
+                echo "$dev_versions" | while read -r version; do
+                    echo "    - $version"
+                done
+                echo ""
+            fi
+            
+            # Get latest stable
+            local latest_stable=$(echo "$stable_versions" | head -1)
+            if [ -n "$latest_stable" ]; then
+                echo "  🌟 Latest Stable: $latest_stable"
+            fi
+        else
+            echo "⚠️  Could not fetch versions from GitHub API"
+            echo ""
+            echo "Fallback - Known stable versions:"
+            echo "  Stable Versions (Recommended):"
+            echo "    - 3.35.3 (latest stable)"
+            echo "    - 3.24.5"
+            echo "    - 3.22.4"
+            echo "    - 3.19.6"
+            echo ""
+            echo "  Beta Versions:"
+            echo "    - 3.36.0-0.1.pre"
+            echo "    - 3.35.0-0.1.pre"
+            echo ""
+            echo "  Dev Versions:"
+            echo "    - 3.37.0-0.0.dev"
+        fi
+    }
+    
+    fetch_and_categorize_versions
+    echo ""
+    echo "Usage:"
+    echo "  flutter-versions <version>  - Validate a specific version"
+    echo "  flutter-install <version>   - Install a version"
+    echo "  flutter-list               - List installed versions"
+    exit 0
+fi
+
+# Validate the provided version
+echo "🔍 Validating version: $VERSION"
+echo ""
+
+if validate_version "$VERSION"; then
+    echo "✅ Version format is valid: $VERSION"
+    
+    # Check if it's a known stable version
+    case $VERSION in
+        3.35.3|3.24.5|3.22.4|3.19.6)
+            echo "📌 This is a stable version (recommended)"
+            ;;
+        3.36.0-0.1.pre|3.35.0-0.1.pre)
+            echo "⚠️  This is a beta version"
+            ;;
+        3.37.0-0.0.dev)
+            echo "⚠️  This is a dev version (unstable)"
+            ;;
+        *)
+            echo "⚠️  This version may not be available or supported"
+            ;;
+    esac
+    
+    # Check if already installed
+    if [ -d "$HOME/flutter/flutter-$VERSION" ]; then
+        echo "📦 This version is already installed"
+        if [ -L "$HOME/.fvm/current" ] && [ "$(readlink "$HOME/.fvm/current")" = "$HOME/flutter/flutter-$VERSION" ]; then
+            echo "✅ This is the currently active version"
+        fi
+    else
+        echo "📦 This version is not installed"
+        echo ""
+        echo "To install this version:"
+        echo "  flutter-install $VERSION"
+    fi
+    
+else
+    echo "❌ Invalid version format: $VERSION"
+    echo ""
+    echo "Version should be in format: X.Y.Z"
+    echo "Examples: 3.24.5, 3.35.3, 3.22.4"
+    echo ""
+    echo "For beta/dev versions, use: X.Y.Z-0.1.pre or X.Y.Z-0.0.dev"
+    exit 1
+fi
