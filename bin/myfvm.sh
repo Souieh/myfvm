@@ -168,7 +168,7 @@ run_subcommand() {
     else
         echo "❌ Command '$script_name' not found"
         echo ""
-        echo "Available commands: install, uninstall, switch, list, current, versions, cleanup, cache"
+        echo "Available commands: install, uninstall, switch, list, current, versions, cleanup, cache, update"
         exit 1
     fi
 }
