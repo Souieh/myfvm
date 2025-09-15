@@ -1,0 +1,20 @@
+#!/bin/bash
+
+# Default Flutter script - shows helpful message when no version is selected
+
+echo "❌ No Flutter version selected"
+echo ""
+echo "Please select a Flutter version using MyFVM:"
+echo ""
+echo "  myfvm.sh install 3.24.5    # Install Flutter 3.24.5"
+echo "  myfvm.sh switch 3.24.5     # Switch to Flutter 3.24.5"
+echo "  myfvm.sh list              # List installed versions"
+echo ""
+echo "Or install the latest stable version:"
+echo "  myfvm.sh install latest"
+echo ""
+echo "For more help:"
+echo "  myfvm.sh help"
+echo ""
+
+exit 1

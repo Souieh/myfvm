@@ -163,11 +163,15 @@ print_info "Setting up Flutter version management..."
 FVM_DIR="$HOME/.fvm"
 mkdir -p "$FVM_DIR"
 
-# Create a placeholder symlink (will be updated when versions are installed)
+# Copy default Flutter installation (shows helpful message)
+if [ -d "$INSTALL_DIR/default" ]; then
+    cp -r "$INSTALL_DIR/default" "$FVM_DIR/"
+    print_success "Created default Flutter installation"
+fi
+
+# Create current symlink pointing to default (will be updated when versions are installed)
 if [ ! -L "$FVM_DIR/current" ]; then
-    # Create a placeholder that points to a non-existent directory
-    # This will be updated when the first Flutter version is installed
-    ln -sf "/tmp/flutter-placeholder" "$FVM_DIR/current"
+    ln -sf "$FVM_DIR/default" "$FVM_DIR/current"
     print_success "Created FVM current symlink"
 fi
 
