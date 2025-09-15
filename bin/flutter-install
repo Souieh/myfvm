@@ -192,6 +192,12 @@ git remote add upstream https://github.com/flutter/flutter.git
 git config remote.origin.url https://github.com/flutter/flutter.git
 git config remote.upstream.url https://github.com/flutter/flutter.git
 
+# Set Flutter channel to stable
+echo "stable" > .flutter-version
+
+# Set environment variable to dismiss warnings
+echo "export FLUTTER_GIT_URL=https://github.com/flutter/flutter.git" >> ~/.bashrc
+
 # Create symlink to current
 echo "🔗 Creating symlink..."
 ln -sf "$VERSION_DIR" "$FVM_DIR/current"

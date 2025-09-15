@@ -20,11 +20,32 @@ fix_flutter_git() {
     if [ -d "$version_dir/.git" ]; then
         cd "$version_dir"
         
+        # Check if this is actually a Flutter repository
+        local current_remote=$(git remote get-url origin 2>/dev/null || echo "")
+        if [[ "$current_remote" == *"flutter/flutter"* ]]; then
+            echo "✅ $version_name already has correct Flutter remote"
+            # Still apply additional fixes
+        fi
+        
+        # If it's pointing to wrong repository, we need to reinstall
+        if [[ "$current_remote" == *"myfvm"* ]] || [[ "$current_remote" == *"Souieh"* ]]; then
+            echo "❌ $version_name is corrupted (pointing to MyFVM repository)"
+            echo "   This installation needs to be reinstalled."
+            echo "   Run: myfvm.sh uninstall $version_name && myfvm.sh install $version_name"
+            return 1
+        fi
+        
         # Set proper git remotes
         git remote set-url origin https://github.com/flutter/flutter.git 2>/dev/null || true
         git remote add upstream https://github.com/flutter/flutter.git 2>/dev/null || true
         git config remote.origin.url https://github.com/flutter/flutter.git 2>/dev/null || true
         git config remote.upstream.url https://github.com/flutter/flutter.git 2>/dev/null || true
+        
+        # Set Flutter channel to stable
+        echo "stable" > .flutter-version 2>/dev/null || true
+        
+        # Set environment variable to dismiss the warning
+        echo "export FLUTTER_GIT_URL=https://github.com/flutter/flutter.git" >> ~/.bashrc 2>/dev/null || true
         
         echo "✅ Fixed git configuration for $version_name"
     else
