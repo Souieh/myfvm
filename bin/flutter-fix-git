@@ -1,0 +1,54 @@
+#!/bin/bash
+
+# MyFVM - Fix git configuration for Flutter installations
+# Fixes "unknown source" warnings in flutter doctor
+
+echo "🔧 MyFVM - Fixing Flutter Git Configuration"
+echo "=========================================="
+echo ""
+
+FLUTTER_DIR="$HOME/flutter"
+FVM_DIR="$HOME/.fvm"
+
+# Function to fix git config for a Flutter installation
+fix_flutter_git() {
+    local version_dir=$1
+    local version_name=$(basename "$version_dir")
+    
+    echo "🔧 Fixing git configuration for $version_name..."
+    
+    if [ -d "$version_dir/.git" ]; then
+        cd "$version_dir"
+        
+        # Set proper git remotes
+        git remote set-url origin https://github.com/flutter/flutter.git 2>/dev/null || true
+        git remote add upstream https://github.com/flutter/flutter.git 2>/dev/null || true
+        git config remote.origin.url https://github.com/flutter/flutter.git 2>/dev/null || true
+        git config remote.upstream.url https://github.com/flutter/flutter.git 2>/dev/null || true
+        
+        echo "✅ Fixed git configuration for $version_name"
+    else
+        echo "❌ No git repository found in $version_name"
+    fi
+}
+
+# Fix all Flutter installations
+if [ -d "$FLUTTER_DIR" ]; then
+    echo "📁 Found Flutter installations in $FLUTTER_DIR"
+    echo ""
+    
+    for version_dir in "$FLUTTER_DIR"/flutter-*; do
+        if [ -d "$version_dir" ]; then
+            fix_flutter_git "$version_dir"
+        fi
+    done
+else
+    echo "❌ No Flutter installations found in $FLUTTER_DIR"
+    exit 1
+fi
+
+echo ""
+echo "✅ Git configuration fixed for all Flutter installations!"
+echo ""
+echo "Now run 'flutter doctor' to verify the fix."
+echo "The 'unknown source' warnings should be resolved."

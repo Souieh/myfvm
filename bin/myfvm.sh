@@ -38,6 +38,7 @@ show_help() {
     echo "    cache <command>      - Manage version cache"
     echo ""
     echo "  🛠️  Utility:"
+    echo "    fix-git              - Fix git configuration for Flutter installations"
     echo "    help                 - Show this help"
     echo "    version              - Show MyFVM version"
     echo "    status               - Check MyFVM status"
@@ -223,6 +224,9 @@ case $COMMAND in
     cache)
         run_subcommand "cache" "$@"
         ;;
+    fix-git)
+        run_subcommand "fix-git" "$@"
+        ;;
     update)
         update_myfvm
         ;;
@@ -242,7 +246,7 @@ case $COMMAND in
         echo "❌ Unknown command: $COMMAND"
         echo ""
         echo "Available commands:"
-        echo "  install, uninstall, switch, list, current, versions, cleanup, cache, update, help, version, status"
+        echo "  install, uninstall, switch, list, current, versions, cleanup, cache, fix-git, update, help, version, status"
         echo ""
         echo "Use 'myfvm help' for detailed information"
         exit 1
