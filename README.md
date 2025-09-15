@@ -17,7 +17,7 @@ A lightweight Flutter version manager that uses symlinks for fast version switch
 One-liner installation from GitHub:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/souieh/myfvm/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/Souieh/myfvm/main/install.sh | bash
 ```
 
 ### Manual Installation
@@ -57,7 +57,7 @@ cd ~/.local/share/myfvm && git pull origin main
 To uninstall MyFVM:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/souieh/myfvm/main/uninstall.sh | bash
+curl -fsSL https://raw.githubusercontent.com/Souieh/myfvm/main/uninstall.sh | bash
 ```
 
 Or manually:
