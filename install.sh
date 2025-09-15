@@ -72,16 +72,25 @@ mkdir -p "$BIN_DIR"
 if [ -d "$INSTALL_DIR/.git" ]; then
     print_warning "MyFVM is already installed at $INSTALL_DIR"
     echo ""
-    read -p "Do you want to update it? (y/N): " -n 1 -r
-    echo
-    if [[ $REPLY =~ ^[Yy]$ ]]; then
-        print_info "Updating MyFVM..."
+    
+    # Check if running in non-interactive mode (curl | bash)
+    if [ ! -t 0 ]; then
+        print_info "Non-interactive mode detected. Updating MyFVM..."
         cd "$INSTALL_DIR"
         git pull origin main
         print_success "MyFVM updated successfully!"
     else
-        print_info "Installation cancelled."
-        exit 0
+        read -p "Do you want to update it? (y/N): " -n 1 -r
+        echo
+        if [[ $REPLY =~ ^[Yy]$ ]]; then
+            print_info "Updating MyFVM..."
+            cd "$INSTALL_DIR"
+            git pull origin main
+            print_success "MyFVM updated successfully!"
+        else
+            print_info "Installation cancelled."
+            exit 0
+        fi
     fi
 else
     # Clone the repository
@@ -141,18 +150,26 @@ if ! echo "$PATH" | grep -q "$INSTALL_DIR/bin"; then
         SHELL_RC="$HOME/.profile"
     fi
     
-    read -p "Do you want to add MyFVM to your PATH automatically? (y/N): " -n 1 -r
-    echo
-    if [[ $REPLY =~ ^[Yy]$ ]]; then
+    # Check if running in non-interactive mode
+    if [ ! -t 0 ]; then
+        print_info "Non-interactive mode detected. Adding MyFVM to PATH..."
         echo "export PATH=\"$INSTALL_DIR/bin:\$PATH\"" >> "$SHELL_RC"
         print_success "Added MyFVM to PATH in $SHELL_RC"
         print_warning "Please run 'source $SHELL_RC' or restart your terminal"
     else
-        print_warning "MyFVM bin directory is not in your PATH"
-        echo ""
-        echo "To add it manually, run:"
-        echo "  echo 'export PATH=\"$INSTALL_DIR/bin:\$PATH\"' >> $SHELL_RC"
-        echo "  source $SHELL_RC"
+        read -p "Do you want to add MyFVM to your PATH automatically? (y/N): " -n 1 -r
+        echo
+        if [[ $REPLY =~ ^[Yy]$ ]]; then
+            echo "export PATH=\"$INSTALL_DIR/bin:\$PATH\"" >> "$SHELL_RC"
+            print_success "Added MyFVM to PATH in $SHELL_RC"
+            print_warning "Please run 'source $SHELL_RC' or restart your terminal"
+        else
+            print_warning "MyFVM bin directory is not in your PATH"
+            echo ""
+            echo "To add it manually, run:"
+            echo "  echo 'export PATH=\"$INSTALL_DIR/bin:\$PATH\"' >> $SHELL_RC"
+            echo "  source $SHELL_RC"
+        fi
     fi
 else
     print_success "MyFVM bin directory is already in PATH"
@@ -187,18 +204,26 @@ if ! echo "$PATH" | grep -q "$FVM_DIR/current/bin"; then
         SHELL_RC="$HOME/.profile"
     fi
     
-    read -p "Do you want to add Flutter to your PATH automatically? (y/N): " -n 1 -r
-    echo
-    if [[ $REPLY =~ ^[Yy]$ ]]; then
+    # Check if running in non-interactive mode
+    if [ ! -t 0 ]; then
+        print_info "Non-interactive mode detected. Adding Flutter to PATH..."
         echo "export PATH=\"$FVM_DIR/current/bin:\$PATH\"" >> "$SHELL_RC"
         print_success "Added Flutter to PATH in $SHELL_RC"
         print_warning "Please run 'source $SHELL_RC' or restart your terminal"
     else
-        print_warning "Flutter is not in your PATH"
-        echo ""
-        echo "To add it manually, run:"
-        echo "  echo 'export PATH=\"$FVM_DIR/current/bin:\$PATH\"' >> $SHELL_RC"
-        echo "  source $SHELL_RC"
+        read -p "Do you want to add Flutter to your PATH automatically? (y/N): " -n 1 -r
+        echo
+        if [[ $REPLY =~ ^[Yy]$ ]]; then
+            echo "export PATH=\"$FVM_DIR/current/bin:\$PATH\"" >> "$SHELL_RC"
+            print_success "Added Flutter to PATH in $SHELL_RC"
+            print_warning "Please run 'source $SHELL_RC' or restart your terminal"
+        else
+            print_warning "Flutter is not in your PATH"
+            echo ""
+            echo "To add it manually, run:"
+            echo "  echo 'export PATH=\"$FVM_DIR/current/bin:\$PATH\"' >> $SHELL_RC"
+            echo "  source $SHELL_RC"
+        fi
     fi
 else
     print_success "Flutter is already in PATH"
