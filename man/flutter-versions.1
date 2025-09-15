@@ -1,0 +1,43 @@
+.TH FLUTTER-VERSIONS 1 "September 2024" "MyFVM" "Flutter Version Manager"
+.SH NAME
+flutter-versions \- Show available Flutter versions
+.SH SYNOPSIS
+.B flutter-versions
+[\fIversion\fR]
+.SH DESCRIPTION
+Display available Flutter versions fetched from the GitHub API, categorized by stability (stable, beta, dev). Optionally validate a specific version string.
+.SH OPTIONS
+.TP
+.B \fIversion\fR
+Optional version string to validate
+.SH EXAMPLES
+.TP
+.B flutter-versions
+Show all available Flutter versions
+.TP
+.B flutter-versions 3.24.5
+Validate version 3.24.5
+.SH OUTPUT
+The command shows:
+.TP
+.B Stable versions
+Production-ready Flutter releases
+.TP
+.B Beta versions
+Pre-release Flutter versions
+.TP
+.B Dev versions
+Development Flutter versions
+.TP
+.B Validation result
+If a version is specified, shows if it's valid
+.SH FILES
+.TP
+.B ~/.cache/myfvm/versions.json
+Cached version information (1 hour cache)
+.SH SEE ALSO
+.BR myfvm.sh (1),
+.BR flutter-install (1),
+.BR flutter-cache (1)
+.SH AUTHOR
+Written by Souieh

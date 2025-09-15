@@ -188,7 +188,7 @@ Individual scripts are also available directly:
 
 ## Enhanced Features
 
-- 🎯 **Unified Command Interface** - Single `myfvm` command with subcommands
+- 🎯 **Unified Command Interface** - Single `myfvm.sh` command with subcommands
 - ✅ **Version validation** - Validates version formats and availability
 - 🧹 **Auto cleanup** - Removes incomplete installations
 - 📋 **Comprehensive listing** - Shows installed and available versions
@@ -198,3 +198,35 @@ Individual scripts are also available directly:
 - 🌐 **Dynamic version fetching** - Fetches latest versions from GitHub API
 - 🗄️ **Smart caching** - Caches version data for faster access
 - 🔄 **Cache management** - Clear and refresh version cache
+- 📚 **Man pages** - Complete documentation for all commands
+- ⌨️ **Bash completion** - Tab completion for commands and versions
+- 🚀 **Direct PATH access** - No symlinks, direct script access
+
+## Documentation & Completion
+
+### Man Pages
+
+Complete manual pages are available for all commands:
+
+```bash
+man myfvm.sh           # Main MyFVM manual
+man flutter-install    # Install command manual
+man flutter-list       # List command manual
+man flutter-switch     # Switch command manual
+man flutter-current    # Current command manual
+man flutter-versions   # Versions command manual
+man flutter-cache      # Cache command manual
+```
+
+### Bash Completion
+
+Tab completion is available for commands and versions:
+
+```bash
+myfvm.sh <TAB>         # Shows: install, uninstall, switch, list, current, versions, cleanup, cache, help, version, status, update
+myfvm.sh install <TAB>  # Shows: 3.24.5, 3.24.3, 3.24.1, 3.22.6, etc.
+myfvm.sh cache <TAB>   # Shows: status, clear, refresh
+flutter-install <TAB>  # Shows: 3.24.5, 3.24.3, 3.24.1, 3.22.6, etc.
+```
+
+Completion is automatically installed and configured during MyFVM installation.

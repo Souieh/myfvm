@@ -1,0 +1,32 @@
+.TH FLUTTER-CURRENT 1 "September 2024" "MyFVM" "Flutter Version Manager"
+.SH NAME
+flutter-current \- Show current Flutter version
+.SH SYNOPSIS
+.B flutter-current
+.SH DESCRIPTION
+Display information about the currently active Flutter version, including the version number, installation path, and symlink status.
+.SH EXAMPLES
+.TP
+.B flutter-current
+Show current Flutter version information
+.SH OUTPUT
+The command shows:
+.TP
+.B Current version
+The active Flutter version number
+.TP
+.B Installation path
+Full path to the Flutter installation
+.TP
+.B Symlink status
+Whether the current symlink is valid
+.SH FILES
+.TP
+.B ~/.fvm/current
+Symlink to currently active Flutter version
+.SH SEE ALSO
+.BR myfvm.sh (1),
+.BR flutter-list (1),
+.BR flutter-switch (1)
+.SH AUTHOR
+Written by Souieh

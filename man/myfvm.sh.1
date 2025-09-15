@@ -1,0 +1,90 @@
+.TH MYFVM.SH 1 "September 2024" "MyFVM" "Flutter Version Manager"
+.SH NAME
+myfvm.sh \- Custom Flutter Version Manager
+.SH SYNOPSIS
+.B myfvm.sh
+[\fIcommand\fR] [\fIoptions\fR]
+.SH DESCRIPTION
+MyFVM is a lightweight Flutter version manager that uses symlinks for fast version switching. It provides both a unified command interface and direct access to individual scripts.
+.SH COMMANDS
+.TP
+.B install \fIversion\fR
+Install a new Flutter version
+.TP
+.B uninstall \fIversion\fR
+Remove a Flutter version
+.TP
+.B switch \fIversion\fR
+Switch to an existing version
+.TP
+.B list
+List all installed versions
+.TP
+.B current
+Show current version info
+.TP
+.B versions [\fIversion\fR]
+Show available versions and validate version strings
+.TP
+.B cleanup
+Clean up incomplete installations and broken symlinks
+.TP
+.B cache \fIcommand\fR
+Cache management utility (status, clear, refresh)
+.TP
+.B help
+Show detailed help
+.TP
+.B status
+Check MyFVM configuration and status
+.TP
+.B version
+Show MyFVM version information
+.TP
+.B update
+Update MyFVM to latest version
+.SH EXAMPLES
+.TP
+.B myfvm.sh install 3.24.5
+Install Flutter version 3.24.5
+.TP
+.B myfvm.sh switch 3.24.5
+Switch to Flutter version 3.24.5
+.TP
+.B myfvm.sh list
+List all installed Flutter versions
+.TP
+.B myfvm.sh versions 3.24.5
+Validate version 3.24.5
+.TP
+.B myfvm.sh cache clear
+Clear version cache
+.SH DIRECTORY STRUCTURE
+.TP
+.B ~/flutter/
+Flutter versions storage directory
+.TP
+.B ~/.fvm/current
+Symlink to active Flutter version
+.TP
+.B ~/.myfvmrc
+Configuration file
+.SH FILES
+.TP
+.B ~/.myfvmrc
+Configuration file for MyFVM settings
+.TP
+.B ~/.cache/myfvm/versions.json
+Cached version information
+.SH SEE ALSO
+.BR flutter-install (1),
+.BR flutter-list (1),
+.BR flutter-switch (1),
+.BR flutter-current (1),
+.BR flutter-versions (1),
+.BR flutter-cleanup (1),
+.BR flutter-cache (1)
+.SH AUTHOR
+Written by Souieh
+.SH BUGS
+Report bugs at https://github.com/Souieh/myfvm/issues

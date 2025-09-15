@@ -1,0 +1,37 @@
+.TH FLUTTER-CACHE 1 "September 2024" "MyFVM" "Flutter Version Manager"
+.SH NAME
+flutter-cache \- Manage version cache
+.SH SYNOPSIS
+.B flutter-cache
+\fIcommand\fR
+.SH DESCRIPTION
+Manage the version cache used by MyFVM to store Flutter version information fetched from the GitHub API.
+.SH COMMANDS
+.TP
+.B status
+Show cache file location, size, and age
+.TP
+.B clear
+Remove the cache file
+.TP
+.B refresh
+Force refresh the cache by fetching new data
+.SH EXAMPLES
+.TP
+.B flutter-cache status
+Show cache information
+.TP
+.B flutter-cache clear
+Clear the version cache
+.TP
+.B flutter-cache refresh
+Refresh the version cache
+.SH FILES
+.TP
+.B ~/.cache/myfvm/versions.json
+Cache file containing version information
+.SH SEE ALSO
+.BR myfvm.sh (1),
+.BR flutter-versions (1)
+.SH AUTHOR
+Written by Souieh

@@ -101,6 +101,32 @@ fi
 print_info "Setting up permissions..."
 chmod +x "$INSTALL_DIR/bin/"*
 
+# Install bash completion
+print_info "Installing bash completion..."
+if [ -d "$INSTALL_DIR/completions" ]; then
+    # Create completion directory if it doesn't exist
+    mkdir -p "$HOME/.local/share/bash-completion/completions" 2>/dev/null || true
+    
+    # Copy completion file
+    if [ -f "$INSTALL_DIR/completions/myfvm" ]; then
+        cp "$INSTALL_DIR/completions/myfvm" "$HOME/.local/share/bash-completion/completions/"
+        print_success "Bash completion installed"
+    fi
+fi
+
+# Install man pages
+print_info "Installing man pages..."
+if [ -d "$INSTALL_DIR/man" ]; then
+    # Create man directory if it doesn't exist
+    mkdir -p "$HOME/.local/share/man/man1" 2>/dev/null || true
+    
+    # Copy man pages
+    if [ -f "$INSTALL_DIR/man/myfvm.sh.1" ]; then
+        cp "$INSTALL_DIR/man/"*.1 "$HOME/.local/share/man/man1/" 2>/dev/null || true
+        print_success "Man pages installed"
+    fi
+fi
+
 # Add MyFVM bin directory to PATH
 print_info "Adding MyFVM to PATH..."
 
@@ -155,6 +181,11 @@ if [ -f "$INSTALL_DIR/bin/myfvm.sh" ]; then
     echo "  flutter-versions           # Show available versions"
     echo "  flutter-cleanup             # Clean up incomplete installs"
     echo "  flutter-cache              # Manage version cache"
+    echo ""
+    echo "Documentation:"
+    echo "  man myfvm.sh               # Manual page for MyFVM"
+    echo "  man flutter-install        # Manual page for install command"
+    echo "  Tab completion available   # Press Tab for command completion"
     echo ""
     echo "For more information, visit: https://github.com/$GITHUB_USER/$REPO_NAME"
 else

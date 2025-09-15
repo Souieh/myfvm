@@ -1,0 +1,35 @@
+.TH FLUTTER-LIST 1 "September 2024" "MyFVM" "Flutter Version Manager"
+.SH NAME
+flutter-list \- List installed Flutter versions
+.SH SYNOPSIS
+.B flutter-list
+.SH DESCRIPTION
+Display all installed Flutter versions with their status and installation details.
+.SH EXAMPLES
+.TP
+.B flutter-list
+List all installed Flutter versions
+.SH OUTPUT
+The command shows:
+.TP
+.B Installed versions
+List of all Flutter versions found in ~/flutter/
+.TP
+.B Current version
+Currently active version (if any)
+.TP
+.B Installation status
+Whether each version is complete or incomplete
+.SH FILES
+.TP
+.B ~/flutter/
+Directory containing Flutter installations
+.TP
+.B ~/.fvm/current
+Symlink to currently active version
+.SH SEE ALSO
+.BR myfvm.sh (1),
+.BR flutter-install (1),
+.BR flutter-current (1)
+.SH AUTHOR
+Written by Souieh

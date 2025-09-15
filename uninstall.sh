@@ -62,6 +62,21 @@ if [[ ! $REPLY =~ ^[Yy]$ ]]; then
     exit 0
 fi
 
+# Remove bash completion
+if [ -f "$HOME/.local/share/bash-completion/completions/myfvm" ]; then
+    print_info "Removing bash completion..."
+    rm -f "$HOME/.local/share/bash-completion/completions/myfvm"
+    print_success "Bash completion removed"
+fi
+
+# Remove man pages
+if [ -f "$HOME/.local/share/man/man1/myfvm.sh.1" ]; then
+    print_info "Removing man pages..."
+    rm -f "$HOME/.local/share/man/man1/myfvm.sh.1"
+    rm -f "$HOME/.local/share/man/man1/flutter-"*.1 2>/dev/null || true
+    print_success "Man pages removed"
+fi
+
 # Remove installation directory
 if [ -d "$myfvm_dir" ]; then
     print_info "Removing MyFVM installation directory..."

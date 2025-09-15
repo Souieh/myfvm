@@ -1,0 +1,32 @@
+.TH FLUTTER-SWITCH 1 "September 2024" "MyFVM" "Flutter Version Manager"
+.SH NAME
+flutter-switch \- Switch between Flutter versions
+.SH SYNOPSIS
+.B flutter-switch
+\fIversion\fR
+.SH DESCRIPTION
+Switch to a different Flutter version by updating the symlink at ~/.fvm/current to point to the specified version.
+.SH OPTIONS
+.TP
+.B \fIversion\fR
+The Flutter version to switch to (must be installed)
+.SH EXAMPLES
+.TP
+.B flutter-switch 3.24.5
+Switch to Flutter version 3.24.5
+.TP
+.B flutter-switch 3.22.6
+Switch to Flutter version 3.22.6
+.SH FILES
+.TP
+.B ~/.fvm/current
+Symlink to currently active Flutter version
+.TP
+.B ~/flutter/flutter-\fIversion\fR/
+Target Flutter version directory
+.SH SEE ALSO
+.BR myfvm.sh (1),
+.BR flutter-list (1),
+.BR flutter-current (1)
+.SH AUTHOR
+Written by Souieh
