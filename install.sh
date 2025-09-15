@@ -103,7 +103,7 @@ chmod +x "$INSTALL_DIR/bin/"*
 
 # Create symlink to myfvm command
 print_info "Creating symlink to myfvm command..."
-ln -sf "$INSTALL_DIR/bin/myfvm" "$BIN_DIR/myfvm"
+ln -sf "$INSTALL_DIR/bin/myfvm.sh" "$BIN_DIR/myfvm"
 
 # Check if $BIN_DIR is in PATH
 if ! echo "$PATH" | grep -q "$BIN_DIR"; then

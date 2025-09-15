@@ -40,9 +40,9 @@ if [ -L "$(which myfvm 2>/dev/null)" ]; then
     symlink_path=$(which myfvm)
     myfvm_dir=$(dirname "$(readlink "$symlink_path")")
     myfvm_dir=$(dirname "$myfvm_dir")  # Go up one level from bin/
-elif [ -f "$HOME/.local/share/myfvm/bin/myfvm" ]; then
+elif [ -f "$HOME/.local/share/myfvm/bin/myfvm.sh" ]; then
     myfvm_dir="$HOME/.local/share/myfvm"
-elif [ -f "$HOME/Projects/myfvm/bin/myfvm" ]; then
+elif [ -f "$HOME/Projects/myfvm/bin/myfvm.sh" ]; then
     myfvm_dir="$HOME/Projects/myfvm"
 else
     print_error "MyFVM installation not found"
