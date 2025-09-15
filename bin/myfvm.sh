@@ -61,8 +61,27 @@ show_help() {
 
 # Function to show version
 show_version() {
-    echo "MyFVM version: 1.0.0"
+    # Get version from VERSION file
+    local version_file="$(dirname "$0")/../VERSION"
+    local myfvm_version="1.0.0"  # fallback
+    
+    if [ -f "$version_file" ]; then
+        myfvm_version=$(cat "$version_file" | head -1 | tr -d '\n\r')
+    fi
+    
+    echo "MyFVM version: $myfvm_version"
     echo "Flutter versions supported: 3.19.6+"
+    
+    # Show git info if available
+    local git_dir="$(dirname "$0")/../.git"
+    if [ -d "$git_dir" ]; then
+        local git_commit=$(cd "$(dirname "$0")/.." && git rev-parse --short HEAD 2>/dev/null)
+        local git_branch=$(cd "$(dirname "$0")/.." && git branch --show-current 2>/dev/null)
+        if [ -n "$git_commit" ]; then
+            echo "Git commit: $git_commit"
+            echo "Git branch: $git_branch"
+        fi
+    fi
 }
 
 # Function to show status
@@ -149,7 +168,7 @@ update_myfvm() {
             echo "✅ MyFVM updated successfully!"
             echo ""
             echo "New version:"
-            "$myfvm_dir/bin/myfvm" version
+            "$myfvm_dir/bin/myfvm.sh" version
         else
             echo "✅ MyFVM is already up to date!"
         fi
