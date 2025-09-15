@@ -101,23 +101,11 @@ fi
 print_info "Setting up permissions..."
 chmod +x "$INSTALL_DIR/bin/"*
 
-# Create symlink to myfvm command
-print_info "Creating symlink to myfvm command..."
-ln -sf "$INSTALL_DIR/bin/myfvm.sh" "$BIN_DIR/myfvm"
+# Add MyFVM bin directory to PATH
+print_info "Adding MyFVM to PATH..."
 
-# Check if $BIN_DIR is in PATH
-if ! echo "$PATH" | grep -q "$BIN_DIR"; then
-    print_warning "$BIN_DIR is not in your PATH"
-    echo ""
-    echo "To add it to your PATH, run:"
-    echo "  echo 'export PATH=\"$BIN_DIR:\$PATH\"' >> ~/.bashrc"
-    echo "  source ~/.bashrc"
-    echo ""
-    echo "Or add it to your shell profile:"
-    echo "  ~/.zshrc (for zsh)"
-    echo "  ~/.profile (for other shells)"
-    echo ""
-    
+# Check if MyFVM bin directory is already in PATH
+if ! echo "$PATH" | grep -q "$INSTALL_DIR/bin"; then
     # Try to detect shell and suggest the right file
     if [ -n "$ZSH_VERSION" ]; then
         SHELL_RC="$HOME/.zshrc"
@@ -127,33 +115,49 @@ if ! echo "$PATH" | grep -q "$BIN_DIR"; then
         SHELL_RC="$HOME/.profile"
     fi
     
-    read -p "Do you want to add $BIN_DIR to your PATH automatically? (y/N): " -n 1 -r
+    read -p "Do you want to add MyFVM to your PATH automatically? (y/N): " -n 1 -r
     echo
     if [[ $REPLY =~ ^[Yy]$ ]]; then
-        echo "export PATH=\"$BIN_DIR:\$PATH\"" >> "$SHELL_RC"
-        print_success "Added $BIN_DIR to PATH in $SHELL_RC"
+        echo "export PATH=\"$INSTALL_DIR/bin:\$PATH\"" >> "$SHELL_RC"
+        print_success "Added MyFVM to PATH in $SHELL_RC"
         print_warning "Please run 'source $SHELL_RC' or restart your terminal"
+    else
+        print_warning "MyFVM bin directory is not in your PATH"
+        echo ""
+        echo "To add it manually, run:"
+        echo "  echo 'export PATH=\"$INSTALL_DIR/bin:\$PATH\"' >> $SHELL_RC"
+        echo "  source $SHELL_RC"
     fi
+else
+    print_success "MyFVM bin directory is already in PATH"
 fi
 
 # Test installation
 print_info "Testing installation..."
-if [ -f "$BIN_DIR/myfvm" ]; then
+if [ -f "$INSTALL_DIR/bin/myfvm.sh" ]; then
     print_success "MyFVM installed successfully!"
     echo ""
     echo "Installation details:"
     echo "  📁 Installation directory: $INSTALL_DIR"
-    echo "  🔗 Command symlink: $BIN_DIR/myfvm"
     echo "  📋 Configuration file: $INSTALL_DIR/.myfvmrc"
     echo ""
-    echo "Usage:"
-    echo "  myfvm help                 # Show help"
-    echo "  myfvm install 3.24.5      # Install Flutter 3.24.5"
-    echo "  myfvm list                # List installed versions"
-    echo "  myfvm status              # Check MyFVM status"
+    echo "Available commands:"
+    echo "  myfvm.sh help              # Show help"
+    echo "  myfvm.sh install 3.24.5    # Install Flutter 3.24.5"
+    echo "  myfvm.sh list              # List installed versions"
+    echo "  myfvm.sh status            # Check MyFVM status"
+    echo ""
+    echo "Direct script access:"
+    echo "  flutter-install 3.24.5     # Install Flutter version"
+    echo "  flutter-list               # List installed versions"
+    echo "  flutter-switch 3.24.5      # Switch to version"
+    echo "  flutter-current            # Show current version"
+    echo "  flutter-versions           # Show available versions"
+    echo "  flutter-cleanup             # Clean up incomplete installs"
+    echo "  flutter-cache              # Manage version cache"
     echo ""
     echo "For more information, visit: https://github.com/$GITHUB_USER/$REPO_NAME"
 else
-    print_error "Installation failed - myfvm command not found"
+    print_error "Installation failed - myfvm.sh not found"
     exit 1
 fi

@@ -35,12 +35,7 @@ print_info() {
 
 # Find MyFVM installation
 myfvm_dir=""
-if [ -L "$(which myfvm 2>/dev/null)" ]; then
-    # If myfvm is a symlink, find the real path
-    symlink_path=$(which myfvm)
-    myfvm_dir=$(dirname "$(readlink "$symlink_path")")
-    myfvm_dir=$(dirname "$myfvm_dir")  # Go up one level from bin/
-elif [ -f "$HOME/.local/share/myfvm/bin/myfvm.sh" ]; then
+if [ -f "$HOME/.local/share/myfvm/bin/myfvm.sh" ]; then
     myfvm_dir="$HOME/.local/share/myfvm"
 elif [ -f "$HOME/Projects/myfvm/bin/myfvm.sh" ]; then
     myfvm_dir="$HOME/Projects/myfvm"
@@ -67,13 +62,6 @@ if [[ ! $REPLY =~ ^[Yy]$ ]]; then
     exit 0
 fi
 
-# Remove symlink
-if [ -L "$HOME/.local/bin/myfvm" ]; then
-    print_info "Removing symlink..."
-    rm -f "$HOME/.local/bin/myfvm"
-    print_success "Symlink removed"
-fi
-
 # Remove installation directory
 if [ -d "$myfvm_dir" ]; then
     print_info "Removing MyFVM installation directory..."
@@ -82,10 +70,17 @@ if [ -d "$myfvm_dir" ]; then
 fi
 
 # Check if PATH needs to be cleaned up
-if grep -q "$HOME/.local/bin" ~/.bashrc 2>/dev/null; then
-    print_warning "Found $HOME/.local/bin in your ~/.bashrc"
-    echo "You may want to remove it if you don't use other tools from there:"
-    echo "  sed -i '/export PATH=\"\$HOME\/.local\/bin:\$PATH\"/d' ~/.bashrc"
+myfvm_bin_path="$myfvm_dir/bin"
+if grep -q "$myfvm_bin_path" ~/.bashrc 2>/dev/null; then
+    print_warning "Found MyFVM bin directory in your ~/.bashrc"
+    echo "You may want to remove it:"
+    echo "  sed -i '/export PATH=\"$myfvm_bin_path:\$PATH\"/d' ~/.bashrc"
+fi
+
+if grep -q "$myfvm_bin_path" ~/.zshrc 2>/dev/null; then
+    print_warning "Found MyFVM bin directory in your ~/.zshrc"
+    echo "You may want to remove it:"
+    echo "  sed -i '/export PATH=\"$myfvm_bin_path:\$PATH\"/d' ~/.zshrc"
 fi
 
 print_success "MyFVM uninstalled successfully!"

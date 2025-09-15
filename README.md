@@ -24,7 +24,7 @@ curl -fsSL https://raw.githubusercontent.com/Souieh/myfvm/main/install.sh | bash
 
 1. Clone this repository:
    ```bash
-   git clone https://github.com/souieh/myfvm.git ~/.local/share/myfvm
+   git clone https://github.com/Souieh/myfvm.git ~/.local/share/myfvm
    ```
 
 2. Add to PATH:
@@ -35,8 +35,8 @@ curl -fsSL https://raw.githubusercontent.com/Souieh/myfvm/main/install.sh | bash
 
 3. Install Flutter versions:
    ```bash
-   myfvm install 3.24.5
-   myfvm install 3.35.3
+   myfvm.sh install 3.24.5
+   myfvm.sh install 3.35.3
    ```
 
 ### Update
@@ -44,7 +44,7 @@ curl -fsSL https://raw.githubusercontent.com/Souieh/myfvm/main/install.sh | bash
 To update MyFVM to the latest version:
 
 ```bash
-myfvm update
+myfvm.sh update
 ```
 
 Or manually:
@@ -63,45 +63,79 @@ curl -fsSL https://raw.githubusercontent.com/Souieh/myfvm/main/uninstall.sh | ba
 Or manually:
 ```bash
 rm -rf ~/.local/share/myfvm
-rm -f ~/.local/bin/myfvm
+# Remove PATH entry from ~/.bashrc or ~/.zshrc if added
 ```
 
 **Note:** Uninstalling MyFVM will NOT remove your Flutter installations or configuration files.
 
 ## Usage
 
+### Unified Command Interface
+
 ```bash
 # Show help and available commands
-myfvm help
+myfvm.sh help
 
 # Install a Flutter version
-myfvm install 3.24.5
+myfvm.sh install 3.24.5
 
 # Switch to a version
-myfvm switch 3.24.5
+myfvm.sh switch 3.24.5
 
 # List installed versions
-myfvm list
+myfvm.sh list
 
 # Check current version
-myfvm current
+myfvm.sh current
 
 # Show available versions
-myfvm versions
+myfvm.sh versions
 
 # Uninstall a version
-myfvm uninstall 3.24.5
+myfvm.sh uninstall 3.24.5
 
 # Clean up incomplete installations
-myfvm cleanup
+myfvm.sh cleanup
 
 # Check MyFVM status
-myfvm status
+myfvm.sh status
 
 # Manage version cache
-myfvm cache status
-myfvm cache clear
-myfvm cache refresh
+myfvm.sh cache status
+myfvm.sh cache clear
+myfvm.sh cache refresh
+```
+
+### Direct Script Access
+
+You can also use the individual scripts directly:
+
+```bash
+# Install a Flutter version
+flutter-install 3.24.5
+
+# Switch to a version
+flutter-switch 3.24.5
+
+# List installed versions
+flutter-list
+
+# Check current version
+flutter-current
+
+# Show available versions
+flutter-versions
+
+# Uninstall a version
+flutter-uninstall 3.24.5
+
+# Clean up incomplete installations
+flutter-cleanup
+
+# Manage version cache
+flutter-cache status
+flutter-cache clear
+flutter-cache refresh
 ```
 
 ## Directory Structure
@@ -118,24 +152,39 @@ myfvm cache refresh
 
 ## Commands
 
-MyFVM uses a unified command structure: `myfvm <command> [options]`
+MyFVM provides both a unified command interface and direct script access.
 
-### Core Commands
-- `myfvm install <version>` - Install a new Flutter version
-- `myfvm switch <version>` - Switch to an existing version
-- `myfvm list` - List all installed versions
-- `myfvm current` - Show current version info
+### Unified Command Interface: `myfvm.sh <command> [options]`
 
-### Management Commands
-- `myfvm uninstall <version>` - Remove a Flutter version
-- `myfvm versions [version]` - Show available versions and validate version strings
-- `myfvm cleanup` - Clean up incomplete installations and broken symlinks
+#### Core Commands
+- `myfvm.sh install <version>` - Install a new Flutter version
+- `myfvm.sh switch <version>` - Switch to an existing version
+- `myfvm.sh list` - List all installed versions
+- `myfvm.sh current` - Show current version info
 
-### Utility Commands
-- `myfvm help` - Show detailed help
-- `myfvm status` - Check MyFVM configuration and status
-- `myfvm version` - Show MyFVM version information
-- `myfvm cache <command>` - Cache management utility
+#### Management Commands
+- `myfvm.sh uninstall <version>` - Remove a Flutter version
+- `myfvm.sh versions [version]` - Show available versions and validate version strings
+- `myfvm.sh cleanup` - Clean up incomplete installations and broken symlinks
+
+#### Utility Commands
+- `myfvm.sh help` - Show detailed help
+- `myfvm.sh status` - Check MyFVM configuration and status
+- `myfvm.sh version` - Show MyFVM version information
+- `myfvm.sh cache <command>` - Cache management utility
+- `myfvm.sh update` - Update MyFVM to latest version
+
+### Direct Script Access
+
+Individual scripts are also available directly:
+- `flutter-install <version>` - Install Flutter version
+- `flutter-switch <version>` - Switch to version
+- `flutter-list` - List installed versions
+- `flutter-current` - Show current version
+- `flutter-versions` - Show available versions
+- `flutter-uninstall <version>` - Remove version
+- `flutter-cleanup` - Clean up installations
+- `flutter-cache <command>` - Cache management
 
 ## Enhanced Features
 
