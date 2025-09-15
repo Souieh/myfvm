@@ -33,6 +33,13 @@ if command -v flutter >/dev/null 2>&1; then
 else
     echo "❌ Flutter is not in PATH"
     echo ""
+    echo "Flutter version details (using symlink):"
+    if [ -L "$FVM_DIR/current" ] && [ -f "$FVM_DIR/current/bin/flutter" ]; then
+        "$FVM_DIR/current/bin/flutter" --version
+    else
+        echo "  No Flutter installation found at symlink"
+    fi
+    echo ""
     echo "To add Flutter to PATH:"
     echo "  echo 'export PATH=\"\$HOME/.fvm/current/bin:\$PATH\"' >> ~/.bashrc"
     echo "  source ~/.bashrc"

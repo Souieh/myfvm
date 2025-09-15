@@ -148,6 +148,10 @@ flutter-cache refresh
 
 ~/.fvm/
 └── current -> ~/flutter/flutter-3.24.5
+
+PATH includes:
+- ~/.local/share/myfvm/bin (MyFVM commands)
+- ~/.fvm/current/bin (Flutter command)
 ```
 
 ## Commands
@@ -230,3 +234,16 @@ flutter-install <TAB>  # Shows: 3.24.5, 3.24.3, 3.24.1, 3.22.6, etc.
 ```
 
 Completion is automatically installed and configured during MyFVM installation.
+
+### Automatic PATH Setup
+
+MyFVM automatically sets up your PATH during installation:
+
+1. **MyFVM Commands**: `~/.local/share/myfvm/bin` added to PATH
+2. **Flutter Command**: `~/.fvm/current/bin` added to PATH
+
+This means:
+- ✅ `myfvm.sh` commands work immediately
+- ✅ `flutter` command works after switching versions
+- ✅ No manual PATH configuration needed
+- ✅ Automatic Flutter command access

@@ -87,4 +87,4 @@ echo "📍 Location: $VERSION_DIR"
 echo "🔗 Symlink: $FVM_DIR/current -> $VERSION_DIR"
 echo ""
 echo "Current Flutter version:"
-flutter --version
+"$VERSION_DIR/bin/flutter" --version

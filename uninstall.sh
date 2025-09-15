@@ -84,18 +84,39 @@ if [ -d "$myfvm_dir" ]; then
     print_success "Installation directory removed"
 fi
 
+# Remove FVM directory
+if [ -d "$HOME/.fvm" ]; then
+    print_info "Removing FVM directory..."
+    rm -rf "$HOME/.fvm"
+    print_success "FVM directory removed"
+fi
+
 # Check if PATH needs to be cleaned up
 myfvm_bin_path="$myfvm_dir/bin"
+fvm_current_path="$HOME/.fvm/current/bin"
+
 if grep -q "$myfvm_bin_path" ~/.bashrc 2>/dev/null; then
     print_warning "Found MyFVM bin directory in your ~/.bashrc"
     echo "You may want to remove it:"
     echo "  sed -i '/export PATH=\"$myfvm_bin_path:\$PATH\"/d' ~/.bashrc"
 fi
 
+if grep -q "$fvm_current_path" ~/.bashrc 2>/dev/null; then
+    print_warning "Found Flutter PATH in your ~/.bashrc"
+    echo "You may want to remove it:"
+    echo "  sed -i '/export PATH=\"$fvm_current_path:\$PATH\"/d' ~/.bashrc"
+fi
+
 if grep -q "$myfvm_bin_path" ~/.zshrc 2>/dev/null; then
     print_warning "Found MyFVM bin directory in your ~/.zshrc"
     echo "You may want to remove it:"
     echo "  sed -i '/export PATH=\"$myfvm_bin_path:\$PATH\"/d' ~/.zshrc"
+fi
+
+if grep -q "$fvm_current_path" ~/.zshrc 2>/dev/null; then
+    print_warning "Found Flutter PATH in your ~/.zshrc"
+    echo "You may want to remove it:"
+    echo "  sed -i '/export PATH=\"$fvm_current_path:\$PATH\"/d' ~/.zshrc"
 fi
 
 print_success "MyFVM uninstalled successfully!"

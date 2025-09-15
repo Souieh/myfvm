@@ -158,6 +158,48 @@ else
     print_success "MyFVM bin directory is already in PATH"
 fi
 
+# Create FVM directory and current symlink
+print_info "Setting up Flutter version management..."
+FVM_DIR="$HOME/.fvm"
+mkdir -p "$FVM_DIR"
+
+# Create a placeholder symlink (will be updated when versions are installed)
+if [ ! -L "$FVM_DIR/current" ]; then
+    # Create a placeholder that points to a non-existent directory
+    # This will be updated when the first Flutter version is installed
+    ln -sf "/tmp/flutter-placeholder" "$FVM_DIR/current"
+    print_success "Created FVM current symlink"
+fi
+
+# Add FVM current to PATH for flutter command access
+print_info "Adding Flutter to PATH..."
+if ! echo "$PATH" | grep -q "$FVM_DIR/current/bin"; then
+    # Try to detect shell and suggest the right file
+    if [ -n "$ZSH_VERSION" ]; then
+        SHELL_RC="$HOME/.zshrc"
+    elif [ -n "$BASH_VERSION" ]; then
+        SHELL_RC="$HOME/.bashrc"
+    else
+        SHELL_RC="$HOME/.profile"
+    fi
+    
+    read -p "Do you want to add Flutter to your PATH automatically? (y/N): " -n 1 -r
+    echo
+    if [[ $REPLY =~ ^[Yy]$ ]]; then
+        echo "export PATH=\"$FVM_DIR/current/bin:\$PATH\"" >> "$SHELL_RC"
+        print_success "Added Flutter to PATH in $SHELL_RC"
+        print_warning "Please run 'source $SHELL_RC' or restart your terminal"
+    else
+        print_warning "Flutter is not in your PATH"
+        echo ""
+        echo "To add it manually, run:"
+        echo "  echo 'export PATH=\"$FVM_DIR/current/bin:\$PATH\"' >> $SHELL_RC"
+        echo "  source $SHELL_RC"
+    fi
+else
+    print_success "Flutter is already in PATH"
+fi
+
 # Test installation
 print_info "Testing installation..."
 if [ -f "$INSTALL_DIR/bin/myfvm.sh" ]; then
@@ -166,6 +208,8 @@ if [ -f "$INSTALL_DIR/bin/myfvm.sh" ]; then
     echo "Installation details:"
     echo "  📁 Installation directory: $INSTALL_DIR"
     echo "  📋 Configuration file: $INSTALL_DIR/.myfvmrc"
+    echo "  🔗 Flutter symlink: $FVM_DIR/current"
+    echo "  🚀 Flutter PATH: $FVM_DIR/current/bin"
     echo ""
     echo "Available commands:"
     echo "  myfvm.sh help              # Show help"
